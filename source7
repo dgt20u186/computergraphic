@@ -1,0 +1,93 @@
+<html>
+<head/>
+<body>
+<canvas id='lesson7' width='500' height='500' style="border:1px solid"> </canvas>
+<p>Rotate figure right</p>
+<input type="Angle" id="angle"/>
+<input type="button" id="btn" value="Rotate">
+<script>
+    let canvas=document.getElementById('lesson7');
+    let ctx = canvas.getContext('2d');
+    Points = []
+
+    class Point {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    function drawBezierCurve(point1, point2, point3) {
+        let t = 0;
+        let inter = setInterval(function () {
+            let bezierPoint1 = findBezierPoint(point1, point2, t);
+            let bezierPoint2 = findBezierPoint(point2, point3, t);
+            let mainBezierPoint = findBezierPoint(bezierPoint1, bezierPoint2, t);
+
+            drawPoint(mainBezierPoint, '#458B96');
+            t = t + 0.005;
+            if (t > 1) {
+                clearInterval(inter);
+            }
+        }, 1);
+    }
+
+    function findBezierPoint(point1, point2, t) {
+        let x = (1 - t) * point1.x + t * point2.x;
+        let y = (1 - t) * point1.y + t * point2.y;
+        let newPoint = new Point(x, y);
+        return newPoint;
+    }
+
+    function drawPoint(point, color) {
+        let pointSize = 1;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, pointSize, 0, Math.PI * 2, true);
+        ctx.fill();
+    }
+
+    function turn(angle) {
+        angle = (angle * 3.14)/180;
+        ctx.clearRect( 0 , 0 , 500 , 500);
+        for(let d in Points){
+            let temp = Points[d].x-Points[1].x;
+            Points[d].x = parseInt((Points[d].x - Points[1].x) * Math.cos(angle) - (Points[d].y - Points[1].y)*Math.sin(angle)) + Points[1].x;
+            Points[d].y = parseInt(temp * Math.sin(angle) + (Points[d].y - Points[1].y)*Math.cos(angle)) + Points[1].y;
+            console.log(Points[d].x, Points[d].y);
+        }
+        drawBezierCurve(Points[0], Points[1], Points[2])
+    }
+
+    let firstPoint = null;
+    let secondPoint = null;
+    let thirdPoint = null;
+    let flag = 1;
+    canvas.addEventListener('click', function (e) {
+        if (flag == 1) {
+            firstPoint = new Point(e.offsetX, e.offsetY);
+            ctx.fillRect(firstPoint.x, firstPoint.y, 1, 1);
+            Points[0] = firstPoint;
+            flag = 2;
+        } else if (flag == 2) {
+            secondPoint = new Point(e.offsetX, e.offsetY);
+            ctx.fillRect(secondPoint.x, secondPoint.y, 1, 1);
+            Points[1] = secondPoint;
+            flag = 3;
+        } else {
+            thirdPoint = new Point(e.offsetX, e.offsetY);
+            Points[2] = thirdPoint;
+            ctx.fillRect(thirdPoint.x, thirdPoint.y, 1, 1);
+        }
+
+        canvas.addEventListener("contextmenu", function () {
+            console.log("contextmenu");
+            drawBezierCurve(firstPoint, secondPoint, thirdPoint);
+        });
+    });
+
+    let but = document.getElementById("btn");
+    but.addEventListener("click", function(event){turn(document.getElementById("angle").value)});
+</script>
+</body>
+</html>
