@@ -1,0 +1,49 @@
+<HTML>
+<BODY bgcolor="black">
+<canvas id="lesson2" width="500" height="400">
+</canvas>
+<script>
+    function getrandom(min, max){
+        return Math.random() * (max - min) + min
+    }
+    function Circle(x1, y1, R) {
+        var x = 0, y = R;
+        var error = 0;
+        var delta = (2 - 2 * R);
+        var red = getrandom(0, 255);
+        var green = getrandom(0, 255);
+        var blue = getrandom(0, 255);
+        ctx.fillStyle = "rgb(" + red + "," + green + "," + blue + ")";
+        while (y >= 0) {
+            ctx.fillRect(x1 + x, y1 + y, 1, 1);
+            ctx.fillRect(x1 + x, y1 - y, 1, 1);
+            ctx.fillRect(x1 - x, y1 + y, 1, 1);
+            ctx.fillRect(x1 - x, y1 - y, 1, 1);
+            error = 2 * (delta + y) - 1;
+            if (delta < 0 && error <= 0) {
+                delta += 2 * ++x + 1;
+                continue;
+            }
+            error = 2 * (delta - x) - 1;
+            if (delta > 0 && error > 0) {
+                delta += 1 - 2 * --y;
+                continue;
+            }
+            x++;
+            delta += 2 * (x - y);
+            y--;
+        }
+    }
+</script>
+<script>
+    var canvas = document.getElementById("lesson2");
+    var ctx = canvas.getContext("2d");
+    canvas.addEventListener("click", function(event){
+        x = event.offsetX;
+        y = event.offsetY;
+        R = getrandom(10, 100);
+        Circle(x, y, R);
+    });
+</script>
+</BODY>
+</HTML>
